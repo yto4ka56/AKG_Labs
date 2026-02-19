@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using Lab1.Math;
 
+
 namespace Lab1.IO;
 
 public class ObjParser
@@ -36,6 +37,43 @@ public class ObjParser
                 }
                 Faces.Add(face);
             }
+        }
+    }
+    public void CenterAndNormalizeModel()
+    {
+        if (Vertices.Count == 0) return;
+
+        float minX = float.MaxValue, minY = float.MaxValue, minZ = float.MaxValue;
+        float maxX = float.MinValue, maxY = float.MinValue, maxZ = float.MinValue;
+        
+        foreach (var v in Vertices)
+        {
+            if (v.X < minX) minX = v.X; if (v.X > maxX) maxX = v.X;
+            if (v.Y < minY) minY = v.Y; if (v.Y > maxY) maxY = v.Y;
+            if (v.Z < minZ) minZ = v.Z; if (v.Z > maxZ) maxZ = v.Z;
+        }
+        
+        float centerX = (minX + maxX) / 2.0f;
+        float centerY = (minY + maxY) / 2.0f;
+        float centerZ = (minZ + maxZ) / 2.0f;
+        
+        float sizeX = maxX - minX;
+        float sizeY = maxY - minY;
+        float sizeZ = maxZ - minZ;
+        
+        float maxDimension = System.Math.Max(sizeX, System.Math.Max(sizeY, sizeZ));
+        
+        float scaleFactor = maxDimension > 0 ? 2.0f / maxDimension : 1.0f;
+        
+        for (int i = 0; i < Vertices.Count; i++)
+        {
+            var v = Vertices[i];
+            Vertices[i] = new Vector4(
+                (v.X - centerX) * scaleFactor,
+                (v.Y - centerY) * scaleFactor,
+                (v.Z - centerZ) * scaleFactor,
+                v.W
+            );
         }
     }
 }

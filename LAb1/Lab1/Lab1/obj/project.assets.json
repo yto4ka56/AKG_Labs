@@ -1431,11 +1431,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/maksimbelaev/Documents/3 Курс/AKG/LAb1/Lab1/Lab1/Lab1.csproj",
+      "projectUniqueName": "/Users/maksimbelaev/Documents/AKG_Labs/LAb1/Lab1/Lab1/Lab1.csproj",
       "projectName": "Lab1",
-      "projectPath": "/Users/maksimbelaev/Documents/3 Курс/AKG/LAb1/Lab1/Lab1/Lab1.csproj",
+      "projectPath": "/Users/maksimbelaev/Documents/AKG_Labs/LAb1/Lab1/Lab1/Lab1.csproj",
       "packagesPath": "/Users/maksimbelaev/.nuget/packages/",
-      "outputPath": "/Users/maksimbelaev/Documents/3 Курс/AKG/LAb1/Lab1/Lab1/obj/",
+      "outputPath": "/Users/maksimbelaev/Documents/AKG_Labs/LAb1/Lab1/Lab1/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/maksimbelaev/.nuget/NuGet/NuGet.Config"
@@ -1462,7 +1462,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -1500,12 +1500,26 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.24, 8.0.24]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.osx-x64",
+            "version": "[8.0.24, 8.0.24]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.24, 8.0.24]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

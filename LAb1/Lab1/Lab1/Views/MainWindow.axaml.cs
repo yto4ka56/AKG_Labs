@@ -15,13 +15,14 @@ public partial class MainWindow : Window
     
    
     private float _rotX = 0, _rotY = 0, _rotZ = 0;
-    private float _scale = 100f; 
+    private float _scale = 200f; 
     private float _offsetX = 0, _offsetY = 0;
 
     public MainWindow()
     {
         InitializeComponent();
         _model.Parse("/Users/maksimbelaev/Downloads/Speakers.obj");
+        _model.CenterAndNormalizeModel();
         
         _buffer = new WriteableBitmap(new Avalonia.PixelSize(800, 600), new Avalonia.Vector(96, 96), 
             Avalonia.Platform.PixelFormat.Rgba8888, Avalonia.Platform.AlphaFormat.Premul);
@@ -80,7 +81,7 @@ public partial class MainWindow : Window
                 if (v1.W != 0) { v1.X /= v1.W; v1.Y /= v1.W; }
                 if (v2.W != 0) { v2.X /= v2.W; v2.Y /= v2.W; }
 
-                LineRenderer.DrawLineBresenham(_buffer, (int)v1.X, (int)v1.Y, (int)v2.X, (int)v2.Y, 0xFF00FF00);
+                LineRenderer.DrawLineBresenham(_buffer, (int)v1.X, (int)v1.Y, (int)v2.X, (int)v2.Y, 0xFFFF00FF);
             }
         }
         MyImage.InvalidateVisual();
