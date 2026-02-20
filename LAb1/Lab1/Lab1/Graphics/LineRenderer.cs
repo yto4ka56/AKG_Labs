@@ -10,7 +10,8 @@ public static class LineRenderer
         using var buf = bmp.Lock();
         uint* ptr = (uint*)buf.Address;
         int size = bmp.PixelSize.Width * bmp.PixelSize.Height;
-        for (int i = 0; i < size; i++) ptr[i] = color;
+        
+        new Span<uint>(ptr, size).Fill(color);
     }
 
     public static unsafe void DrawLineBresenham(WriteableBitmap bmp, int x1, int y1, int x2, int y2, uint color)
