@@ -5,6 +5,8 @@ using Lab1.Math;
 using Lab1.IO;
 using Lab1.Graphics;
 using System;
+using Avalonia;
+using Avalonia.Platform;
 
 namespace Lab1.Views;
 
@@ -55,7 +57,6 @@ public partial class MainWindow : Window
         }
         Render();
     }
-
     private void Render()
     {
         LineRenderer.Clear(_buffer);
@@ -71,7 +72,8 @@ public partial class MainWindow : Window
         var modelM = Matrix4x4.Multiply(scaleM, Matrix4x4.Multiply(translationM, rotationM));
 
         var viewM = Matrix4x4.CreateLookAt(new Vector4(0, 0, 500), new Vector4(0, 0, 0), new Vector4(0, 1, 0));
-        var projM = Matrix4x4.CreatePerspective(MathF.PI / 4, 800f / 600f, 1f, 1000f);
+        float aspect = 800f/ 600f;
+        var projM = Matrix4x4.CreatePerspective(MathF.PI / 4, aspect, 1f, 1000f);
         
         var vpM = Matrix4x4.CreateViewport(800, 600);
 
@@ -99,5 +101,4 @@ public partial class MainWindow : Window
         }
         MyImage.InvalidateVisual();
     }
-   
 }

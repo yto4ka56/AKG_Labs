@@ -5,6 +5,7 @@
       <map>
         <entry key="Lab1/App.axaml" value="Lab1/Lab1.csproj" />
         <entry key="Lab1/MainWindow.axaml" value="Lab1/Lab1.csproj" />
+        <entry key="Lab1/Views/MainWindow.axaml" value="Lab1/Lab1.csproj" />
       </map>
     </option>
   </component>
