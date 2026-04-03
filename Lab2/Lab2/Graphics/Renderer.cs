@@ -12,50 +12,59 @@ public static class Renderer
         uint* ptr = (uint*)buf.Address;
         int size = bmp.PixelSize.Width * bmp.PixelSize.Height;
         new Span<uint>(ptr, size).Fill(color);
-        Array.Fill(zBuffer, float.NegativeInfinity);
+        // ЗАДАНИЕ 2: Очищаем буфер глубины бесконечно далеким значением. Ближние пиксели будут меньше
+        Array.Fill(zBuffer, float.MaxValue);
     }
+
+    private static void Swap(ref Vector4 a, ref Vector4 b) { var temp = a; a = b; b = temp; }
 
     public static unsafe void DrawTriangle(WriteableBitmap bmp, float[] zBuffer, Vector4 v1, Vector4 v2, Vector4 v3, uint color)
     {
         int width = bmp.PixelSize.Width;
         int height = bmp.PixelSize.Height;
 
-        // Сортировка вершин по Y
-        if (v1.Y > v2.Y) (v1, v2) = (v2, v1);
-        if (v1.Y > v3.Y) (v1, v3) = (v3, v1);
-        if (v2.Y > v3.Y) (v2, v3) = (v3, v2);
+        // Сортировка вершин по координате Y (сверху вниз)
+        if (v1.Y > v2.Y) Swap(ref v1, ref v2);
+        if (v1.Y > v3.Y) Swap(ref v1, ref v3);
+        if (v2.Y > v3.Y) Swap(ref v2, ref v3);
 
         using var buf = bmp.Lock();
         uint* ptr = (uint*)buf.Address;
 
-        int totalHeight = (int)v3.Y - (int)v1.Y;
-        for (int i = 0; i < totalHeight; i++)
+        // ЗАДАНИЕ 1: Растеризация треугольника методом сканирующей линии (scan-line)
+        int totalHeight = (int)(v3.Y - v1.Y);
+        if (totalHeight == 0) return;
+
+        for (int i = 0; i <= totalHeight; i++)
         {
-            bool secondHalf = i > v2.Y - v1.Y || v2.Y == v1.Y;
+            int y = (int)v1.Y + i;
+            if (y < 0 || y >= height) continue;
+
+            bool secondHalf = i > (v2.Y - v1.Y) || v2.Y == v1.Y;
             int segmentHeight = secondHalf ? (int)(v3.Y - v2.Y) : (int)(v2.Y - v1.Y);
             if (segmentHeight == 0) continue;
 
-            float t1 = (float)i / totalHeight;
-            float t2 = (float)(i - (secondHalf ? v2.Y - v1.Y : 0)) / segmentHeight;
+            float alpha = (float)i / totalHeight;
+            float beta = (float)(i - (secondHalf ? v2.Y - v1.Y : 0)) / segmentHeight;
 
-            Vector4 A = Vector4.Lerp(v1, v3, t1);
-            Vector4 B = secondHalf ? Vector4.Lerp(v2, v3, t2) : Vector4.Lerp(v1, v2, t2);
+            // Находим границы отрезка по горизонтали (A и B)
+            Vector4 A = v1 + (v3 - v1) * alpha;
+            Vector4 B = secondHalf ? v2 + (v3 - v2) * beta : v1 + (v2 - v1) * beta;
 
-            if (A.X > B.X) (A, B) = (B, A);
+            if (A.X > B.X) Swap(ref A, ref B);
 
-            int minX = (int)MathF.Max(0, A.X);
-            int maxX = (int)MathF.Min(width - 1, B.X);
-            int y = (int)v1.Y + i;
-
-            if (y < 0 || y >= height) continue;
+            int minX = (int)MathF.Max(0, MathF.Ceiling(A.X));
+            int maxX = (int)MathF.Min(width - 1, MathF.Floor(B.X));
 
             for (int x = minX; x <= maxX; x++)
             {
-                float phi = B.X != A.X ? (x - A.X) / (B.X - A.X) : 1f;
+                float phi = A.X == B.X ? 1f : (x - A.X) / (B.X - A.X);
                 float z = A.Z + (B.Z - A.Z) * phi;
+                
                 int idx = y * width + x;
 
-                if (idx >= 0 && idx < zBuffer.Length && zBuffer[idx] < z)
+                // ЗАДАНИЕ 2: Z-буфер (сохраняем пиксель только если он ближе)
+                if (idx >= 0 && idx < zBuffer.Length && z < zBuffer[idx])
                 {
                     zBuffer[idx] = z;
                     ptr[idx] = color;

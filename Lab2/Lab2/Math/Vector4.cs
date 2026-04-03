@@ -10,6 +10,8 @@ public struct Vector4
     }
 
     public static Vector4 operator -(Vector4 a, Vector4 b) => new(a.X - b.X, a.Y - b.Y, a.Z - b.Z, 0);
+    public static Vector4 operator +(Vector4 a, Vector4 b) => new(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
+    public static Vector4 operator *(Vector4 a, float scalar) => new(a.X * scalar, a.Y * scalar, a.Z * scalar, a.W * scalar);
     
     public float Length() => (float)System.Math.Sqrt(X * X + Y * Y + Z * Z);
 

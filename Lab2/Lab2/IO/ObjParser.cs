@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using Lab2.Math;
 
-
 namespace Lab2.IO;
 
 public class ObjParser
@@ -28,17 +27,23 @@ public class ObjParser
             }
             else if (parts[0] == "f")
             {
-                int[] face = new int[parts.Length - 1];
+                List<int> faceIndices = new List<int>();
                 for (int i = 1; i < parts.Length; i++)
                 {
                     string vIndexStr = parts[i].Split('/')[0];
                     int index = int.Parse(vIndexStr);
-                    face[i - 1] = index > 0 ? index - 1 : Vertices.Count + index;
+                    faceIndices.Add(index > 0 ? index - 1 : Vertices.Count + index);
                 }
-                Faces.Add(face);
+                
+                // Триангуляция полигонов с >3 вершинами (превращаем в треугольники)
+                for (int i = 1; i < faceIndices.Count - 1; i++)
+                {
+                    Faces.Add(new int[] { faceIndices[0], faceIndices[i], faceIndices[i + 1] });
+                }
             }
         }
     }
+    
     public void CenterAndNormalizeModel()
     {
         if (Vertices.Count == 0) return;
@@ -62,7 +67,6 @@ public class ObjParser
         float sizeZ = maxZ - minZ;
         
         float maxDimension = System.Math.Max(sizeX, System.Math.Max(sizeY, sizeZ));
-        
         float scaleFactor = maxDimension > 0 ? 2.0f / maxDimension : 1.0f;
         
         for (int i = 0; i < Vertices.Count; i++)
