@@ -1,53 +1,45 @@
 using System;
-using Avalonia.Media.Imaging;
 using Lab2.Math;
 
 namespace Lab2.Graphics;
 
 public static class Renderer
 {
-    public static unsafe void Clear(WriteableBitmap bmp, float[] zBuffer, uint color = 0xFF000000)
+    public static unsafe void Clear(uint* ptr, int width, int height, float[] zBuffer, uint color = 0xFF000000)
     {
-        using var buf = bmp.Lock();
-        uint* ptr = (uint*)buf.Address;
-        int size = bmp.PixelSize.Width * bmp.PixelSize.Height;
+        int size = width * height;
         new Span<uint>(ptr, size).Fill(color);
-        // ЗАДАНИЕ 2: Очищаем буфер глубины бесконечно далеким значением. Ближние пиксели будут меньше
         Array.Fill(zBuffer, float.MaxValue);
     }
 
     private static void Swap(ref Vector4 a, ref Vector4 b) { var temp = a; a = b; b = temp; }
 
-    public static unsafe void DrawTriangle(WriteableBitmap bmp, float[] zBuffer, Vector4 v1, Vector4 v2, Vector4 v3, uint color)
+    public static unsafe void DrawTriangle(uint* ptr, int width, int height, float[] zBuffer, Vector4 v1, Vector4 v2, Vector4 v3, uint color)
     {
-        int width = bmp.PixelSize.Width;
-        int height = bmp.PixelSize.Height;
-
-        // Сортировка вершин по координате Y (сверху вниз)
+        
         if (v1.Y > v2.Y) Swap(ref v1, ref v2);
         if (v1.Y > v3.Y) Swap(ref v1, ref v3);
         if (v2.Y > v3.Y) Swap(ref v2, ref v3);
 
-        using var buf = bmp.Lock();
-        uint* ptr = (uint*)buf.Address;
+        int y0 = (int)MathF.Round(v1.Y);
+        int y1 = (int)MathF.Round(v2.Y);
+        int y2 = (int)MathF.Round(v3.Y);
 
-        // ЗАДАНИЕ 1: Растеризация треугольника методом сканирующей линии (scan-line)
-        int totalHeight = (int)(v3.Y - v1.Y);
+        int totalHeight = y2 - y0;
         if (totalHeight == 0) return;
 
         for (int i = 0; i <= totalHeight; i++)
         {
-            int y = (int)v1.Y + i;
+            int y = y0 + i;
             if (y < 0 || y >= height) continue;
 
-            bool secondHalf = i > (v2.Y - v1.Y) || v2.Y == v1.Y;
-            int segmentHeight = secondHalf ? (int)(v3.Y - v2.Y) : (int)(v2.Y - v1.Y);
+            bool secondHalf = i > y1 - y0 || y1 == y0;
+            int segmentHeight = secondHalf ? y2 - y1 : y1 - y0;
             if (segmentHeight == 0) continue;
 
             float alpha = (float)i / totalHeight;
-            float beta = (float)(i - (secondHalf ? v2.Y - v1.Y : 0)) / segmentHeight;
+            float beta = (float)(i - (secondHalf ? y1 - y0 : 0)) / segmentHeight;
 
-            // Находим границы отрезка по горизонтали (A и B)
             Vector4 A = v1 + (v3 - v1) * alpha;
             Vector4 B = secondHalf ? v2 + (v3 - v2) * beta : v1 + (v2 - v1) * beta;
 
@@ -63,11 +55,10 @@ public static class Renderer
                 
                 int idx = y * width + x;
 
-                // ЗАДАНИЕ 2: Z-буфер (сохраняем пиксель только если он ближе)
-                if (idx >= 0 && idx < zBuffer.Length && z < zBuffer[idx])
+                if (z < zBuffer[idx])
                 {
                     zBuffer[idx] = z;
-                    ptr[idx] = color;
+                    ptr[idx] = color; 
                 }
             }
         }

@@ -14,38 +14,34 @@ public partial class MainWindow : Window
     private float[] _zBuffer;
     private ObjParser _model = new();
     
-    // Переменные для вращения и масштаба
     private float _rotX = 0, _rotY = 0, _rotZ = 0;
-    private float _scale = 1.0f; // Начальный масштаб
-    
-    // Переменные состояния мыши
+    private float _scale = 1.0f;
     private bool _isDragging = false;
     private Avalonia.Point _lastMousePosition;
 
-    // Базовый цвет нашей модели
-    private const uint BaseColor = 0xFF1E90FF; // Dodger Blue
+   
+    private const uint BaseColor = 0xFF1E90FF; 
 
     public MainWindow()
     {
         InitializeComponent();
         
-        // Укажите верный путь к вашему OBJ файлу
+        
         _model.Parse("/Users/maksimbelaev/Downloads/baby.obj"); 
         _model.CenterAndNormalizeModel();
         
+        
         _buffer = new WriteableBitmap(new Avalonia.PixelSize(800, 600), new Avalonia.Vector(96, 96), 
-            Avalonia.Platform.PixelFormat.Rgba8888, Avalonia.Platform.AlphaFormat.Premul);
+            Avalonia.Platform.PixelFormat.Bgra8888, Avalonia.Platform.AlphaFormat.Premul);
         _zBuffer = new float[800 * 600];
 
         MyImage.Source = _buffer;
 
-        // Подписываемся на события мыши
         this.PointerPressed += OnPointerPressed;
         this.PointerMoved += OnPointerMoved;
         this.PointerReleased += OnPointerReleased;
         this.PointerWheelChanged += OnPointerWheelChanged;
 
-        // Оставим управление с клавиатуры на всякий случай
         this.KeyDown += (s, e) => {
             if (e.Key == Key.W) _rotX += 0.1f;
             if (e.Key == Key.S) _rotX -= 0.1f;
@@ -59,12 +55,9 @@ public partial class MainWindow : Window
         Render();
     }
 
-    // --- ОБРАБОТКА СОБЫТИЙ МЫШИ ---
-
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         var point = e.GetCurrentPoint(this);
-        // Проверяем, что зажата левая кнопка мыши
         if (point.Properties.IsLeftButtonPressed)
         {
             _isDragging = true;
@@ -79,105 +72,96 @@ public partial class MainWindow : Window
         var currentPoint = e.GetCurrentPoint(this);
         var currentPosition = currentPoint.Position;
         
-        // Вычисляем смещение курсора
         float deltaX = (float)(currentPosition.X - _lastMousePosition.X);
         float deltaY = (float)(currentPosition.Y - _lastMousePosition.Y);
-
-        // Чувствительность вращения
         float sensitivity = 0.01f; 
 
-        // Если зажат Shift, вращаем по оси Z (Roll)
         if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
-        {
             _rotZ += deltaX * sensitivity;
-        }
-        else // Иначе вращаем по X и Y (Pitch и Yaw)
+        else 
         {
             _rotY += deltaX * sensitivity;
-            _rotX += deltaY * sensitivity; // Можно инвертировать, добавив минус перед deltaY, если нравится "инвертированная" мышь
+            _rotX += deltaY * sensitivity; 
         }
 
         _lastMousePosition = currentPosition;
         Render();
     }
 
-    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
-    {
-        _isDragging = false;
-    }
+    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e) => _isDragging = false;
 
     private void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
     {
-        // e.Delta.Y > 0 - прокрутка вперед (приближение)
-        // e.Delta.Y < 0 - прокрутка назад (отдаление)
         float zoomFactor = 1.1f;
-
-        if (e.Delta.Y > 0)
-            _scale *= zoomFactor;
-        else if (e.Delta.Y < 0)
-            _scale /= zoomFactor;
-
+        if (e.Delta.Y > 0) _scale *= zoomFactor;
+        else if (e.Delta.Y < 0) _scale /= zoomFactor;
         Render();
     }
 
-    // --- ЛОГИКА ОТРИСОВКИ ---
-
-    private void Render()
+   
+    private unsafe void Render()
     {
-        Renderer.Clear(_buffer, _zBuffer);
-
-        // Создаем матрицы преобразований
-        var scaleM = Matrix4x4.CreateScale(_scale);
-        var rotX_M = Matrix4x4.CreateRotationX(_rotX);
-        var rotY_M = Matrix4x4.CreateRotationY(_rotY);
-        var rotZ_M = Matrix4x4.CreateRotationZ(_rotZ);
-
-        // Перемножаем матрицы (Масштаб -> Вращение)
-        var rotM = Matrix4x4.Multiply(rotZ_M, Matrix4x4.Multiply(rotX_M, rotY_M));
-        var modelM = Matrix4x4.Multiply(rotM, scaleM);
-        
-        Vector4 cameraPos = new Vector4(0, 0, 2);
-        var viewM = Matrix4x4.CreateLookAt(cameraPos, new Vector4(0, 0, 0), new Vector4(0, 1, 0));
-        var projM = Matrix4x4.CreatePerspective(MathF.PI / 4, 800f/600f, 0.1f, 100f);
-        var vpM = Matrix4x4.CreateViewport(800, 600);
-        
-        var transform = Matrix4x4.Multiply(vpM, Matrix4x4.Multiply(projM, viewM));
-        
-        Vector4 reverseLightDir = Vector4.Normalize(new Vector4(0, 0, 1, 0)); 
-
-        foreach (var face in _model.Faces)
+        // БЛОКИРУЕМ БИТМАП ОДИН РАЗ НА ВЕСЬ КАДР
+        using (var buf = _buffer.Lock())
         {
-            Vector4 v1w = Matrix4x4.Multiply(modelM, _model.Vertices[face[0]]);
-            Vector4 v2w = Matrix4x4.Multiply(modelM, _model.Vertices[face[1]]);
-            Vector4 v3w = Matrix4x4.Multiply(modelM, _model.Vertices[face[2]]);
+            uint* ptr = (uint*)buf.Address;
+            int width = _buffer.PixelSize.Width;
+            int height = _buffer.PixelSize.Height;
 
-            Vector4 normal = Vector4.Normalize(Vector4.Cross(v2w - v1w, v3w - v1w));
+            //  Очищаем экран и Z-буфер
+            Renderer.Clear(ptr, width, height, _zBuffer);
 
-            Vector4 center = new Vector4(
-                (v1w.X + v2w.X + v3w.X) / 3f, 
-                (v1w.Y + v2w.Y + v3w.Y) / 3f, 
-                (v1w.Z + v2w.Z + v3w.Z) / 3f);
+            var scaleM = Matrix4x4.CreateScale(_scale);
+            var rotX_M = Matrix4x4.CreateRotationX(_rotX);
+            var rotY_M = Matrix4x4.CreateRotationY(_rotY);
+            var rotZ_M = Matrix4x4.CreateRotationZ(_rotZ);
 
-            Vector4 viewDir = Vector4.Normalize(cameraPos - center);
-
-            // Отбраковка
-            if (Vector4.Dot(normal, viewDir) < 0) 
-                continue; 
-
-            // Освещение
-            float diffuse = MathF.Max(0, Vector4.Dot(normal, reverseLightDir));
-            float ambient = 0.15f; 
-            float intensity = MathF.Min(1.0f, ambient + diffuse);
+            var rotM = Matrix4x4.Multiply(rotZ_M, Matrix4x4.Multiply(rotX_M, rotY_M));
+            var modelM = Matrix4x4.Multiply(rotM, scaleM);
             
-            uint color = ApplyIntensity(BaseColor, intensity);
+            Vector4 cameraPos = new Vector4(0, 0, 2);
+            var viewM = Matrix4x4.CreateLookAt(cameraPos, new Vector4(0, 0, 0), new Vector4(0, 1, 0));
+            var projM = Matrix4x4.CreatePerspective(MathF.PI / 4, (float)width / height, 0.1f, 100f);
+            var vpM = Matrix4x4.CreateViewport(width, height);
+            
+            var transform = Matrix4x4.Multiply(vpM, Matrix4x4.Multiply(projM, viewM));
+            
+            Vector4 reverseLightDir = Vector4.Normalize(new Vector4(0, 0, 1, 0)); 
 
-            // Проекция
-            Vector4 p1 = Project(v1w, transform);
-            Vector4 p2 = Project(v2w, transform);
-            Vector4 p3 = Project(v3w, transform);
+            //  Рисуем все полигоны
+            foreach (var face in _model.Faces)
+            {
+                Vector4 v1w = Matrix4x4.Multiply(modelM, _model.Vertices[face[0]]);
+                Vector4 v2w = Matrix4x4.Multiply(modelM, _model.Vertices[face[1]]);
+                Vector4 v3w = Matrix4x4.Multiply(modelM, _model.Vertices[face[2]]);
 
-            Renderer.DrawTriangle(_buffer, _zBuffer, p1, p2, p3, color);
-        }
+                Vector4 normal = Vector4.Normalize(Vector4.Cross(v2w - v1w, v3w - v1w));
+
+                Vector4 center = new Vector4(
+                    (v1w.X + v2w.X + v3w.X) / 3f, 
+                    (v1w.Y + v2w.Y + v3w.Y) / 3f, 
+                    (v1w.Z + v2w.Z + v3w.Z) / 3f);
+
+                Vector4 viewDir = Vector4.Normalize(cameraPos - center);
+
+                if (Vector4.Dot(normal, viewDir) < 0) 
+                    continue; 
+
+                float diffuse = MathF.Max(0, Vector4.Dot(normal, reverseLightDir));
+                float ambient = 0.15f; 
+                float intensity = MathF.Min(1.0f, ambient + diffuse);
+                
+                uint color = ApplyIntensity(BaseColor, intensity);
+
+                Vector4 p1 = Project(v1w, transform);
+                Vector4 p2 = Project(v2w, transform);
+                Vector4 p3 = Project(v3w, transform);
+
+                // Передаем указатель, ширину и высоту
+                Renderer.DrawTriangle(ptr, width, height, _zBuffer, p1, p2, p3, color);
+            }
+        } 
+        
         
         MyImage.InvalidateVisual();
     }
@@ -189,6 +173,7 @@ public partial class MainWindow : Window
         return res;
     }
 
+    
     private uint ApplyIntensity(uint color, float intensity)
     {
         uint a = (color >> 24) & 0xFF;
