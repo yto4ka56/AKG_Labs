@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fEBOzI+RZlQ=",
+  "dgSpecHash": "/3wxslTsz5g=",
   "success": true,
-  "projectFilePath": "/Users/maksimbelaev/Documents/AKG_Labs/Lab2/Lab2/Lab2.csproj",
+  "projectFilePath": "/Users/maksimbelaev/Documents/3 Курс/AKG/Lab2/Lab2/Lab2.csproj",
   "expectedPackageFiles": [
     "/Users/maksimbelaev/.nuget/packages/avalonia/11.2.1/avalonia.11.2.1.nupkg.sha512",
     "/Users/maksimbelaev/.nuget/packages/avalonia.angle.windows.natives/2.1.22045.20230930/avalonia.angle.windows.natives.2.1.22045.20230930.nupkg.sha512",
@@ -32,10 +32,7 @@
     "/Users/maksimbelaev/.nuget/packages/skiasharp.nativeassets.webassembly/2.88.8/skiasharp.nativeassets.webassembly.2.88.8.nupkg.sha512",
     "/Users/maksimbelaev/.nuget/packages/skiasharp.nativeassets.win32/2.88.8/skiasharp.nativeassets.win32.2.88.8.nupkg.sha512",
     "/Users/maksimbelaev/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
-    "/Users/maksimbelaev/.nuget/packages/tmds.dbus.protocol/0.20.0/tmds.dbus.protocol.0.20.0.nupkg.sha512",
-    "/Users/maksimbelaev/.nuget/packages/microsoft.netcore.app.ref/8.0.24/microsoft.netcore.app.ref.8.0.24.nupkg.sha512",
-    "/Users/maksimbelaev/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.24/microsoft.aspnetcore.app.ref.8.0.24.nupkg.sha512",
-    "/Users/maksimbelaev/.nuget/packages/microsoft.netcore.app.host.osx-x64/8.0.24/microsoft.netcore.app.host.osx-x64.8.0.24.nupkg.sha512"
+    "/Users/maksimbelaev/.nuget/packages/tmds.dbus.protocol/0.20.0/tmds.dbus.protocol.0.20.0.nupkg.sha512"
   ],
   "logs": []
 }

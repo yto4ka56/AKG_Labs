@@ -18,8 +18,7 @@ public partial class MainWindow : Window
     private float _scale = 1.0f;
     private bool _isDragging = false;
     private Avalonia.Point _lastMousePosition;
-
-    // Троттлинг: не рендерим чаще ~60 fps
+    
     private DateTime _lastRenderTime = DateTime.MinValue;
     private const double RenderIntervalMs = 16.0;
 
@@ -114,8 +113,7 @@ public partial class MainWindow : Window
             int height = _buffer.PixelSize.Height;
 
             Renderer.Clear(ptr, width, height, _zBuffer);
-
-            // Матрицы трансформации
+            
             var scaleM = Matrix4x4.CreateScale(_scale);
             var rotX_M = Matrix4x4.CreateRotationX(_rotX);
             var rotY_M = Matrix4x4.CreateRotationY(_rotY);
@@ -128,24 +126,19 @@ public partial class MainWindow : Window
             var projM  = Matrix4x4.CreatePerspective(MathF.PI / 4, (float)width / height, 0.1f, 100f);
             var vpM    = Matrix4x4.CreateViewport(width, height);
             var transform = Matrix4x4.Multiply(vpM, Matrix4x4.Multiply(projM, viewM));
-
-            // Направление света (обратный вектор — от поверхности к источнику)
+            
             Vector4 lightDir = Vector4.Normalize(new Vector4(0.5f, 1f, 1f, 0));
 
             foreach (var face in _model.Faces)
             {
-                // Мировые позиции вершин
                 Vector4 v1w = Matrix4x4.Multiply(modelM, _model.Vertices[face[0]]);
                 Vector4 v2w = Matrix4x4.Multiply(modelM, _model.Vertices[face[1]]);
                 Vector4 v3w = Matrix4x4.Multiply(modelM, _model.Vertices[face[2]]);
-
-                // Нормали вершин трансформируем только матрицей вращения
-                // (для ортогональных преобразований обратно-транспонированная == исходная)
+                
                 Vector4 n1 = Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[face[0]]));
                 Vector4 n2 = Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[face[1]]));
                 Vector4 n3 = Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[face[2]]));
-
-                // Back-face culling по нормали грани
+                
                 Vector4 faceNormal = Vector4.Normalize(Vector4.Cross(v2w - v1w, v3w - v1w));
                 Vector4 center = new Vector4(
                     (v1w.X + v2w.X + v3w.X) / 3f,
@@ -153,8 +146,7 @@ public partial class MainWindow : Window
                     (v1w.Z + v2w.Z + v3w.Z) / 3f);
                 if (Vector4.Dot(faceNormal, Vector4.Normalize(cameraPos - center)) < 0)
                     continue;
-
-                // Экранные координаты
+                
                 Vector4 p1 = Project(v1w, transform);
                 Vector4 p2 = Project(v2w, transform);
                 Vector4 p3 = Project(v3w, transform);

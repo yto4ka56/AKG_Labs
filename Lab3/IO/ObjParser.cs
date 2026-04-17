@@ -11,7 +11,6 @@ public class ObjParser
     public List<Vector4> Vertices = new();
     public List<int[]> Faces = new();
     
-    // Нормали в вершинах (усреднённые по смежным граням)
     public List<Vector4> VertexNormals = new();
 
     public void Parse(string path)
@@ -38,7 +37,6 @@ public class ObjParser
                     faceIndices.Add(index > 0 ? index - 1 : Vertices.Count + index);
                 }
                 
-                // Триангуляция полигонов с >3 вершинами
                 for (int i = 1; i < faceIndices.Count - 1; i++)
                 {
                     Faces.Add(new int[] { faceIndices[0], faceIndices[i], faceIndices[i + 1] });
@@ -49,7 +47,6 @@ public class ObjParser
         ComputeVertexNormals();
     }
     
-    // Вычисляем нормали вершин усреднением нормалей смежных граней
     private void ComputeVertexNormals()
     {
         var normals = new Vector4[Vertices.Count];
@@ -63,7 +60,7 @@ public class ObjParser
             Vector4 v2 = Vertices[face[2]];
 
             Vector4 faceNormal = Vector4.Cross(v1 - v0, v2 - v0);
-            // Не нормализуем — вес нормали пропорционален площади грани
+            
             normals[face[0]] = normals[face[0]] + faceNormal;
             normals[face[1]] = normals[face[1]] + faceNormal;
             normals[face[2]] = normals[face[2]] + faceNormal;
@@ -109,8 +106,7 @@ public class ObjParser
                 v.W
             );
         }
-        
-        // После нормализации вершин пересчитываем нормали
+   
         ComputeVertexNormals();
     }
 }

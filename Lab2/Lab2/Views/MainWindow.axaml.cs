@@ -18,8 +18,7 @@ public partial class MainWindow : Window
     private float _scale = 1.0f;
     private bool _isDragging = false;
     private Avalonia.Point _lastMousePosition;
-
-    // Throttle: не рендерим чаще чем ~60 fps (16 мс между кадрами)
+    
     private DateTime _lastRenderTime = DateTime.MinValue;
     private const double RenderIntervalMs = 16.0;
 
@@ -69,8 +68,7 @@ public partial class MainWindow : Window
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
         if (!_isDragging) return;
-
-        // Троттлинг: пропускаем событие если прошло меньше 16 мс с последнего рендера
+        
         var now = DateTime.UtcNow;
         if ((now - _lastRenderTime).TotalMilliseconds < RenderIntervalMs)
             return;
