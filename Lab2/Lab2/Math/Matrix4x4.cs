@@ -1,12 +1,13 @@
 namespace Lab2.Math;
 
-public class Matrix4x4
+public struct Matrix4x4
 {
-    public float[,] M = new float[4, 4];
+    public float[,] M;
 
     public static Matrix4x4 Identity()
     {
         var res = new Matrix4x4();
+        res.M = new float[4, 4];
         for (int i = 0; i < 4; i++) res.M[i, i] = 1.0f;
         return res;
     }
@@ -24,6 +25,7 @@ public class Matrix4x4
     public static Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b)
     {
         var res = new Matrix4x4();
+        res.M = new float[4, 4];
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 for (int k = 0; k < 4; k++)
@@ -84,6 +86,7 @@ public class Matrix4x4
     public static Matrix4x4 CreatePerspective(float fov, float aspect, float znear, float zfar)
     {
         var res = new Matrix4x4();
+        res.M = new float[4, 4];
         float h = 1.0f / (float)System.Math.Tan(fov / 2);
         res.M[0, 0] = h / aspect;
         res.M[1, 1] = h;

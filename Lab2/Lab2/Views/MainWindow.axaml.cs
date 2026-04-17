@@ -19,17 +19,18 @@ public partial class MainWindow : Window
     private bool _isDragging = false;
     private Avalonia.Point _lastMousePosition;
 
-   
+    // Throttle: не рендерим чаще чем ~60 fps (16 мс между кадрами)
+    private DateTime _lastRenderTime = DateTime.MinValue;
+    private const double RenderIntervalMs = 16.0;
+
     private const uint BaseColor = 0xFF1E90FF; 
 
     public MainWindow()
     {
         InitializeComponent();
         
-        
         _model.Parse("/Users/maksimbelaev/Downloads/baby.obj"); 
         _model.CenterAndNormalizeModel();
-        
         
         _buffer = new WriteableBitmap(new Avalonia.PixelSize(800, 600), new Avalonia.Vector(96, 96), 
             Avalonia.Platform.PixelFormat.Bgra8888, Avalonia.Platform.AlphaFormat.Premul);
@@ -69,6 +70,11 @@ public partial class MainWindow : Window
     {
         if (!_isDragging) return;
 
+        // Троттлинг: пропускаем событие если прошло меньше 16 мс с последнего рендера
+        var now = DateTime.UtcNow;
+        if ((now - _lastRenderTime).TotalMilliseconds < RenderIntervalMs)
+            return;
+
         var currentPoint = e.GetCurrentPoint(this);
         var currentPosition = currentPoint.Position;
         
@@ -98,17 +104,16 @@ public partial class MainWindow : Window
         Render();
     }
 
-   
     private unsafe void Render()
     {
-        // БЛОКИРУЕМ БИТМАП ОДИН РАЗ НА ВЕСЬ КАДР
+        _lastRenderTime = DateTime.UtcNow;
+
         using (var buf = _buffer.Lock())
         {
             uint* ptr = (uint*)buf.Address;
             int width = _buffer.PixelSize.Width;
             int height = _buffer.PixelSize.Height;
 
-            //  Очищаем экран и Z-буфер
             Renderer.Clear(ptr, width, height, _zBuffer);
 
             var scaleM = Matrix4x4.CreateScale(_scale);
@@ -128,7 +133,6 @@ public partial class MainWindow : Window
             
             Vector4 reverseLightDir = Vector4.Normalize(new Vector4(0, 0, 1, 0)); 
 
-            //  Рисуем все полигоны
             foreach (var face in _model.Faces)
             {
                 Vector4 v1w = Matrix4x4.Multiply(modelM, _model.Vertices[face[0]]);
@@ -157,11 +161,9 @@ public partial class MainWindow : Window
                 Vector4 p2 = Project(v2w, transform);
                 Vector4 p3 = Project(v3w, transform);
 
-                // Передаем указатель, ширину и высоту
                 Renderer.DrawTriangle(ptr, width, height, _zBuffer, p1, p2, p3, color);
             }
         } 
-        
         
         MyImage.InvalidateVisual();
     }
@@ -173,7 +175,6 @@ public partial class MainWindow : Window
         return res;
     }
 
-    
     private uint ApplyIntensity(uint color, float intensity)
     {
         uint a = (color >> 24) & 0xFF;
