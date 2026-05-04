@@ -14,6 +14,11 @@ public partial class MainWindow : Window
     private float[] _zBuffer;
     private ObjParser _model = new();
     
+    // Текстуры
+    private Texture _diffuseTex;
+    private Texture _normalTex;
+    private Texture _specularTex;
+    
     private float _rotX = 0, _rotY = 0, _rotZ = 0;
     private float _scale = 1.0f;
     private bool _isDragging = false;
@@ -22,14 +27,18 @@ public partial class MainWindow : Window
     private DateTime _lastRenderTime = DateTime.MinValue;
     private const double RenderIntervalMs = 16.0;
 
-    private const uint BaseColor = 0xFF1E90FF;
-
     public MainWindow()
     {
         InitializeComponent();
         
-        _model.Parse("/Users/maksimbelaev/Downloads/dragon.obj");
+        // ВАЖНО: Укажите пути к вашей модели и текстурам!
+        // Модель ДОЛЖНА содержать uv координаты (vt) 
+        _model.Parse("/Users/maksimbelaev/Downloads/shovel-knight-2/shovel_low.obj"); 
         _model.CenterAndNormalizeModel();
+        
+        _diffuseTex = new Texture("/Users/maksimbelaev/Downloads/shovel-knight-2/shovel_diffuse.png");
+        _normalTex = new Texture("/Users/maksimbelaev/Downloads/shovel-knight-2/shovel_normal_map.png");
+        _specularTex = new Texture("/Users/maksimbelaev/Downloads/shovel-knight-2/shovel_Metalnes.png");
         
         _buffer = new WriteableBitmap(new Avalonia.PixelSize(800, 600), new Avalonia.Vector(96, 96), 
             Avalonia.Platform.PixelFormat.Bgra8888, Avalonia.Platform.AlphaFormat.Premul);
@@ -112,7 +121,7 @@ public partial class MainWindow : Window
             int width  = _buffer.PixelSize.Width;
             int height = _buffer.PixelSize.Height;
 
-            Renderer.Clear(ptr, width, height, _zBuffer);
+            Renderer.Clear(ptr, width, height, _zBuffer, 0xFF202020); // Темно-серый фон
             
             var scaleM = Matrix4x4.CreateScale(_scale);
             var rotX_M = Matrix4x4.CreateRotationX(_rotX);
@@ -131,14 +140,27 @@ public partial class MainWindow : Window
 
             foreach (var face in _model.Faces)
             {
-                Vector4 v1w = Matrix4x4.Multiply(modelM, _model.Vertices[face[0]]);
-                Vector4 v2w = Matrix4x4.Multiply(modelM, _model.Vertices[face[1]]);
-                Vector4 v3w = Matrix4x4.Multiply(modelM, _model.Vertices[face[2]]);
+                // Получаем индексы
+                var vId0 = face[0].V; var vId1 = face[1].V; var vId2 = face[2].V;
+                var vtId0 = face[0].Vt; var vtId1 = face[1].Vt; var vtId2 = face[2].Vt;
+                var vnId0 = face[0].Vn; var vnId1 = face[1].Vn; var vnId2 = face[2].Vn;
+
+                // Мировые координаты
+                Vector4 v1w = Matrix4x4.Multiply(modelM, _model.Vertices[vId0]);
+                Vector4 v2w = Matrix4x4.Multiply(modelM, _model.Vertices[vId1]);
+                Vector4 v3w = Matrix4x4.Multiply(modelM, _model.Vertices[vId2]);
+
+                // Текстурные координаты (если есть, иначе 0,0)
+                Vector2 uv1 = vtId0 >= 0 ? _model.UVs[vtId0] : new Vector2(0, 0);
+                Vector2 uv2 = vtId1 >= 0 ? _model.UVs[vtId1] : new Vector2(0, 0);
+                Vector2 uv3 = vtId2 >= 0 ? _model.UVs[vtId2] : new Vector2(0, 0);
+
+                // Нормали
+                Vector4 n1 = vnId0 >= 0 ? Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[vnId0])) : new Vector4(0,1,0,0);
+                Vector4 n2 = vnId1 >= 0 ? Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[vnId1])) : new Vector4(0,1,0,0);
+                Vector4 n3 = vnId2 >= 0 ? Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[vnId2])) : new Vector4(0,1,0,0);
                 
-                Vector4 n1 = Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[face[0]]));
-                Vector4 n2 = Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[face[1]]));
-                Vector4 n3 = Vector4.Normalize(Matrix4x4.Multiply(rotM, _model.VertexNormals[face[2]]));
-                
+                // Backface culling
                 Vector4 faceNormal = Vector4.Normalize(Vector4.Cross(v2w - v1w, v3w - v1w));
                 Vector4 center = new Vector4(
                     (v1w.X + v2w.X + v3w.X) / 3f,
@@ -147,17 +169,19 @@ public partial class MainWindow : Window
                 if (Vector4.Dot(faceNormal, Vector4.Normalize(cameraPos - center)) < 0)
                     continue;
                 
+                // Экранные координаты (Оставляем W для перспективной коррекции)
                 Vector4 p1 = Project(v1w, transform);
                 Vector4 p2 = Project(v2w, transform);
                 Vector4 p3 = Project(v3w, transform);
 
-                Renderer.DrawTrianglePhong(
+                Renderer.DrawTriangleTextured(
                     ptr, width, height, _zBuffer,
                     p1, p2, p3,
                     v1w, v2w, v3w,
+                    uv1, uv2, uv3,
                     n1, n2, n3,
-                    cameraPos, lightDir,
-                    BaseColor);
+                    cameraPos, lightDir, rotM,
+                    _diffuseTex, _normalTex, _specularTex);
             }
         }
 
@@ -167,6 +191,7 @@ public partial class MainWindow : Window
     private Vector4 Project(Vector4 v, Matrix4x4 mat)
     {
         Vector4 res = Matrix4x4.Multiply(mat, v);
+        // Сохраняем W для перспективной интерполяции (мы делим только X,Y,Z)
         if (res.W != 0) { res.X /= res.W; res.Y /= res.W; res.Z /= res.W; }
         return res;
     }
