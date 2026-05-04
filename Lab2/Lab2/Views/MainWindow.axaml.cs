@@ -28,7 +28,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         
-        _model.Parse("/Users/maksimbelaev/Downloads/baby.obj"); 
+        _model.Parse("/Users/maksimbelaev/Downloads/dragon.obj"); 
         _model.CenterAndNormalizeModel();
         
         _buffer = new WriteableBitmap(new Avalonia.PixelSize(800, 600), new Avalonia.Vector(96, 96), 

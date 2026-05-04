@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="976e5044-c418-46a5-901f-da1090c4a11d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Math/Matrix4x4.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Math/Matrix4x4.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Lab2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Lab2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Views/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Views/MainWindow.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/Lab2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net8.0/Lab2.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/Lab2.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net8.0/Lab2.pdb" afterDir="false" />
@@ -19,6 +19,22 @@
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/ref/Lab2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/ref/Lab2.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/refint/Avalonia/Lab2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/refint/Avalonia/Lab2.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/refint/Lab2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/refint/Lab2.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/.idea/.idea.Lab3/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/.idea/.idea.Lab3/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/Views/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/Views/MainWindow.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/bin/Debug/net8.0/Lab3.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/bin/Debug/net8.0/Lab3.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/bin/Debug/net8.0/Lab3.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/bin/Debug/net8.0/Lab3.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Avalonia/Lab3.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Avalonia/Lab3.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Avalonia/Lab3.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Avalonia/Lab3.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/Lab3.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/ref/Lab3.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/ref/Lab3.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/refint/Avalonia/Lab3.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/refint/Avalonia/Lab3.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/refint/Lab3.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/Debug/net8.0/refint/Lab3.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Lab3/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/../../Lab3/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +56,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/yto4ka56/AKG_Labs.git&quot;,
-    &quot;accountId&quot;: &quot;fb64caa4-ddb0-4693-b8cd-638ff274333c&quot;
+    &quot;accountId&quot;: &quot;1d683063-b983-47f3-ad9c-d6cec6d0e1f7&quot;
   }
 }</component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -100,6 +116,8 @@
       <option name="presentableId" value="Default" />
       <updated>1776381209163</updated>
       <workItem from="1776381210865" duration="774000" />
+      <workItem from="1776435098450" duration="5335000" />
+      <workItem from="1777816967261" duration="56000" />
     </task>
     <servers />
   </component>
@@ -108,4 +126,22 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.Tasks.TaskCanceledException" breakIfHandledByOtherCode="false" displayValue="System.Threading.Tasks.TaskCanceledException" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
+          <option name="timeStamp" value="3" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
 </project>
